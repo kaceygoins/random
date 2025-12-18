@@ -1,0 +1,1905 @@
+import React, { useState, useEffect } from "react"
+
+export default function MediaKit() {
+    const [hoveredButton, setHoveredButton] = useState(null)
+    const [copiedColor, setCopiedColor] = useState(null)
+    const [hoveredNavButton, setHoveredNavButton] = useState(null)
+    const [showScrollTop, setShowScrollTop] = useState(false)
+    const [isMobile, setIsMobile] = useState(false)
+    const [expandedSections, setExpandedSections] = useState({})
+
+    const copyToClipboard = (text, colorName) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setCopiedColor(colorName)
+            setTimeout(() => setCopiedColor(null), 2000)
+        })
+    }
+
+    const scrollToSection = (sectionId) => {
+        const element = document.getElementById(sectionId)
+        if (element) {
+            const yOffset = -20
+            const y =
+                element.getBoundingClientRect().top +
+                window.pageYOffset +
+                yOffset
+
+            window.scrollTo({
+                top: y,
+                behavior: "smooth",
+            })
+        }
+    }
+
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        })
+    }
+
+    const toggleSection = (sectionId) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [sectionId]: !prev[sectionId],
+        }))
+    }
+
+    // Scroll event listener for back to top button
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 300)
+        }
+
+        window.addEventListener("scroll", handleScroll)
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
+
+    // Mobile detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth <= 768)
+        }
+
+        checkMobile()
+        window.addEventListener("resize", checkMobile)
+
+        return () => window.removeEventListener("resize", checkMobile)
+    }, [])
+
+    // Load the form embed script
+    useEffect(() => {
+        const script = document.createElement("script")
+        script.src = "https://link.msgsndr.com/js/form_embed.js"
+        script.async = true
+        document.body.appendChild(script)
+
+        return () => {
+            if (document.body.contains(script)) {
+                document.body.removeChild(script)
+            }
+        }
+    }, [])
+
+    // Footer data
+    const footerLinks = [
+        { label: "FAQ", href: "https://www.glennlundy.com/faq" },
+        { label: "Blog", href: "https://www.glennlundy.com/blog" },
+        { label: "Events", href: "https://www.glennlundy.com/upcoming-events" },
+        {
+            label: "Media Kit",
+            href: "https://www.glennlundy.com/media-kit",
+        },
+        {
+            label: "Privacy Policy",
+            href: "https://www.glennlundy.com/privacy-policy",
+        },
+        { label: "Contact", href: "https://www.glennlundy.com/contact" },
+    ]
+
+    const socialLinks = [
+        {
+            name: "TikTok",
+            href: "https://www.tiktok.com/@glennlundy",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.76 20.5a6.34 6.34 0 0 0 10.86-4.43V7.83a8.2 8.2 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.8-.26z" />
+                </svg>
+            ),
+        },
+        {
+            name: "YouTube",
+            href: "https://www.youtube.com/@glennlundy",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+            ),
+        },
+        {
+            name: "LinkedIn",
+            href: "https://www.linkedin.com/in/glennlundy/",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                </svg>
+            ),
+        },
+        {
+            name: "Twitter",
+            href: "https://x.com/GlennBLundy800",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                </svg>
+            ),
+        },
+        {
+            name: "Instagram",
+            href: "https://www.instagram.com/Glenn_Lundy",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.40z" />
+                </svg>
+            ),
+        },
+        {
+            name: "Facebook",
+            href: "https://www.facebook.com/OfficialGlennLundy",
+            icon: (
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                </svg>
+            ),
+        },
+    ]
+
+    const styles = {
+        container: {
+            width: "100%",
+            minHeight: "100vh",
+            backgroundColor: "#1a1a1a",
+            color: "#f5f5f5",
+            fontFamily:
+                "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            backgroundImage:
+                "radial-gradient(circle at 20% 50%, rgba(123, 63, 191, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(245, 245, 245, 0.05) 0%, transparent 50%)",
+            position: "relative",
+        },
+        hero: {
+            padding: "120px 24px 60px",
+            textAlign: "center",
+            maxWidth: "1400px",
+            margin: "0 auto",
+        },
+        heroTitle: {
+            fontSize: "clamp(2.5rem, 6vw, 4.5rem)",
+            fontWeight: "900",
+            lineHeight: "1.1",
+            marginBottom: "32px",
+            textTransform: "uppercase",
+            letterSpacing: "-0.02em",
+            color: "#f5f5f5",
+        },
+        heroSubtitle: {
+            fontSize: "clamp(1rem, 2.5vw, 1.3rem)",
+            color: "#939393",
+            marginBottom: "48px",
+            maxWidth: "800px",
+            margin: "0 auto 48px",
+            lineHeight: "1.6",
+        },
+        quickNavSection: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "24px",
+            padding: "40px",
+            margin: "0 24px 60px",
+            maxWidth: "1400px",
+            marginLeft: "auto",
+            marginRight: "auto",
+        },
+        quickNavGrid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 250px)",
+            gap: "20px",
+            justifyContent: "center",
+        },
+        quickNavButton: {
+            padding: "20px 24px",
+            background: "#000000",
+            border: "2px solid #000000",
+            borderRadius: "16px",
+            color: "#f5f5f5",
+            textDecoration: "none",
+            textAlign: "center",
+            fontWeight: "700",
+            fontSize: "1rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            transition: "all 0.3s ease",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            height: "80px",
+        },
+        quickNavButtonHover: {
+            background: "linear-gradient(135deg, #7B3FBF 0%, #9B59B6 100%)",
+            transform: "translateY(-4px)",
+            borderColor: "#9B59B6",
+            boxShadow: "0 15px 40px rgba(123, 63, 191, 0.4)",
+        },
+        section: {
+            padding: "40px 24px",
+            maxWidth: "1400px",
+            margin: "0 auto",
+            position: "relative",
+        },
+        sectionTitle: {
+            fontSize: "clamp(2rem, 4vw, 3rem)",
+            fontWeight: "900",
+            textAlign: "center",
+            marginBottom: "60px",
+            textTransform: "uppercase",
+            letterSpacing: "-0.02em",
+            color: "#f5f5f5",
+        },
+        expandableSection: {
+            backgroundColor: "rgba(245, 245, 245, 0.02)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "16px",
+            marginBottom: "30px",
+            overflow: "hidden",
+            transition: "all 0.3s ease",
+        },
+        expandableHeader: {
+            padding: "25px 30px",
+            backgroundColor: "rgba(123, 63, 191, 0.05)",
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            transition: "all 0.3s ease",
+        },
+        expandableHeaderHover: {
+            backgroundColor: "rgba(123, 63, 191, 0.1)",
+        },
+        expandableTitle: {
+            fontSize: "1.5rem",
+            fontWeight: "700",
+            color: "#f5f5f5",
+            margin: 0,
+        },
+        expandIcon: {
+            fontSize: "1.5rem",
+            color: "#9b59b6",
+            transition: "transform 0.3s ease",
+        },
+        expandIconRotated: {
+            transform: "rotate(180deg)",
+        },
+        expandableContent: {
+            padding: "0 30px",
+            maxHeight: "0",
+            overflow: "hidden",
+            transition: "all 0.5s ease",
+        },
+        expandableContentExpanded: {
+            padding: "30px",
+            maxHeight: "2000px",
+        },
+        downloadSection: {
+            backgroundColor: "rgba(123, 63, 191, 0.05)",
+            borderRadius: "32px",
+            border: "1px solid rgba(123, 63, 191, 0.2)",
+            padding: "60px 40px",
+        },
+        downloadContent: {
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+            gap: "60px",
+            alignItems: "center",
+        },
+        downloadTextColumn: {
+            textAlign: "left",
+        },
+        downloadTitle: {
+            fontSize: "clamp(2rem, 5vw, 3rem)",
+            fontWeight: "900",
+            marginBottom: "20px",
+            textTransform: "uppercase",
+            letterSpacing: "-0.02em",
+            color: "#f5f5f5",
+        },
+        downloadText: {
+            fontSize: "1.2rem",
+            lineHeight: "1.7",
+            color: "#cccccc",
+            marginBottom: "0",
+        },
+        formContainer: {
+            height: "500px",
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            borderRadius: "20px",
+            overflow: "hidden",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+        },
+        formIframe: {
+            width: "100%",
+            height: "100%",
+            border: "none",
+        },
+        bioCard: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "12px",
+            padding: "25px",
+        },
+        bioText: {
+            fontSize: "1rem",
+            color: "#f5f5f5",
+            lineHeight: "1.7",
+        },
+        usageGuidelinesGrid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "40px",
+            marginBottom: "30px",
+        },
+        guidelineCard: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "12px",
+            padding: "25px",
+        },
+        guidelineTitle: {
+            fontSize: "1.3rem",
+            fontWeight: "700",
+            color: "#9b59b6",
+            marginBottom: "20px",
+            borderBottom: "1px solid rgba(155, 89, 182, 0.3)",
+            paddingBottom: "10px",
+        },
+        guidelineList: {
+            listStyle: "none",
+            padding: 0,
+            margin: "15px 0",
+        },
+        guidelineListTitle: {
+            fontWeight: "bold",
+            color: "#f5f5f5",
+            marginBottom: "10px",
+        },
+        guidelineItem: {
+            fontSize: "0.95rem",
+            color: "#cccccc",
+            lineHeight: "1.8",
+            marginBottom: "10px",
+            paddingLeft: "20px",
+            position: "relative",
+        },
+        guidelineItemBefore: (isDont) => ({
+            content: `"${isDont ? "✗" : "✓"}"`,
+            color: isDont ? "#e74c3c" : "#2ecc71",
+            position: "absolute",
+            left: "0",
+            fontWeight: "bold",
+        }),
+        imageGrid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "30px",
+        },
+        imageCard: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "16px",
+            overflow: "hidden",
+            transition: "all 0.3s ease",
+        },
+        imageCardHover: {
+            transform: "translateY(-8px)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+            borderColor: "rgba(155, 89, 182, 0.3)",
+        },
+        imagePreview: {
+            width: "100%",
+            height: "200px",
+            backgroundColor: "#f0f0f0",
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+        },
+        imageInfo: {
+            padding: "20px",
+        },
+        imageTitle: {
+            fontSize: "1.2rem",
+            fontWeight: "700",
+            color: "#f5f5f5",
+            marginBottom: "8px",
+        },
+        imageDescription: {
+            fontSize: "0.9rem",
+            color: "#939393",
+            marginBottom: "20px",
+            lineHeight: "1.5",
+        },
+        downloadButton: {
+            display: "inline-block",
+            width: "100%",
+            padding: "12px 20px",
+            backgroundColor: "#7b3fbf",
+            color: "#f5f5f5",
+            textAlign: "center",
+            textDecoration: "none",
+            borderRadius: "10px",
+            fontWeight: "600",
+            transition: "background-color 0.3s ease",
+        },
+        colorsSection: {
+            backgroundColor: "rgba(245, 245, 245, 0.02)",
+            borderRadius: "24px",
+            padding: "40px",
+            marginBottom: "60px",
+        },
+        colorPalette: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gap: "20px",
+            marginBottom: "40px",
+        },
+        colorCard: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "16px",
+            padding: "20px",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            position: "relative",
+            overflow: "hidden",
+        },
+        colorCardHover: {
+            backgroundColor: "rgba(123, 63, 191, 0.05)",
+            borderColor: "rgba(155, 89, 182, 0.3)",
+            transform: "translateY(-8px)",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.4)",
+        },
+        colorHeader: {
+            display: "flex",
+            alignItems: "center",
+            gap: "16px",
+            marginBottom: "16px",
+        },
+        colorSwatch: {
+            width: "50px",
+            height: "50px",
+            borderRadius: "12px",
+            border: "2px solid rgba(245, 245, 245, 0.1)",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+            flexShrink: 0,
+        },
+        colorMainInfo: {
+            flex: 1,
+        },
+        colorName: {
+            fontSize: "1.1rem",
+            fontWeight: "700",
+            color: "#f5f5f5",
+            marginBottom: "4px",
+        },
+        colorHex: {
+            fontSize: "1rem",
+            color: "#9b59b6",
+            fontFamily: "monospace",
+            fontWeight: "600",
+        },
+        colorTechnicalInfo: {
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "12px",
+            marginBottom: "16px",
+        },
+        colorSpec: {
+            backgroundColor: "rgba(245, 245, 245, 0.02)",
+            borderRadius: "8px",
+            padding: "8px 12px",
+            border: "1px solid rgba(245, 245, 245, 0.05)",
+        },
+        specLabel: {
+            fontSize: "0.75rem",
+            fontWeight: "600",
+            color: "#939393",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            marginBottom: "2px",
+        },
+        specValue: {
+            fontSize: "0.85rem",
+            color: "#f5f5f5",
+            fontFamily: "monospace",
+        },
+        colorUsage: {
+            fontSize: "0.9rem",
+            color: "#939393",
+            fontStyle: "italic",
+            lineHeight: "1.4",
+            padding: "12px",
+            backgroundColor: "rgba(245, 245, 245, 0.02)",
+            borderRadius: "8px",
+            border: "1px solid rgba(245, 245, 245, 0.05)",
+        },
+        copyIndicator: {
+            position: "absolute",
+            top: "16px",
+            right: "16px",
+            backgroundColor: "#7b3fbf",
+            color: "#f5f5f5",
+            padding: "4px 8px",
+            borderRadius: "6px",
+            fontSize: "0.75rem",
+            fontWeight: "600",
+            opacity: 0,
+            transform: "translateY(-10px)",
+            transition: "all 0.3s ease",
+        },
+        copyIndicatorVisible: {
+            opacity: 1,
+            transform: "translateY(0)",
+        },
+        fontsSection: {
+            backgroundColor: "rgba(245, 245, 245, 0.02)",
+            borderRadius: "24px",
+            padding: "60px 40px",
+            marginBottom: "60px",
+        },
+        fontExample: {
+            marginBottom: "40px",
+            padding: "30px",
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            borderRadius: "16px",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+        },
+        fontName: {
+            fontSize: "1.5rem",
+            fontWeight: "700",
+            color: "#9b59b6",
+            marginBottom: "20px",
+        },
+        fontSample: {
+            fontSize: "clamp(1.8rem, 4vw, 2.5rem)",
+            fontWeight: "900",
+            marginBottom: "15px",
+            color: "#f5f5f5",
+        },
+        fontDescription: {
+            fontSize: "1rem",
+            color: "#939393",
+            lineHeight: "1.6",
+        },
+        specsGrid: {
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "30px",
+            marginBottom: "60px",
+        },
+        specCard: {
+            backgroundColor: "rgba(245, 245, 245, 0.03)",
+            border: "1px solid rgba(245, 245, 245, 0.08)",
+            borderRadius: "16px",
+            padding: "30px",
+            textAlign: "center",
+        },
+        specTitle: {
+            fontSize: "1.2rem",
+            fontWeight: "700",
+            color: "#f5f5f5",
+            marginBottom: "10px",
+        },
+        specValueLarge: {
+            fontSize: "1.5rem",
+            fontWeight: "900",
+            color: "#9b59b6",
+            marginBottom: "10px",
+        },
+        specDescription: {
+            fontSize: "0.9rem",
+            color: "#939393",
+        },
+        scrollToTop: {
+            position: "fixed",
+            bottom: "30px",
+            right: "30px",
+            width: "50px",
+            height: "50px",
+            backgroundColor: "#7b3fbf",
+            color: "#f5f5f5",
+            border: "none",
+            borderRadius: "50%",
+            cursor: "pointer",
+            fontSize: "1.2rem",
+            display: showScrollTop ? "flex" : "none",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 20px rgba(123, 63, 191, 0.4)",
+            zIndex: 1000,
+        },
+        scrollToTopHover: {
+            backgroundColor: "#9b59b6",
+            transform: "translateY(-2px)",
+            boxShadow: "0 8px 30px rgba(123, 63, 191, 0.6)",
+        },
+        purpleAccent: {
+            color: "#9b59b6",
+        },
+        grayAccent: {
+            color: "#939393",
+        },
+        footer: {
+            backgroundColor: "rgba(26, 26, 26, 0.98)",
+            borderTop: "1px solid rgba(245, 245, 245, 0.08)",
+            padding: isMobile ? "40px 0 30px" : "60px 0 40px",
+            fontFamily:
+                '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            position: "relative",
+            overflow: "hidden",
+        },
+        footerGlowEffect: {
+            position: "absolute",
+            top: "-50%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: isMobile ? "400px" : "800px",
+            height: isMobile ? "200px" : "400px",
+            background:
+                "radial-gradient(circle, rgba(123, 63, 191, 0.1) 0%, transparent 70%)",
+            filter: "blur(120px)",
+            pointerEvents: "none",
+        },
+        footerContainer: {
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: isMobile ? "0 20px" : "0 24px",
+            position: "relative",
+            zIndex: 2,
+        },
+        footerContent: {
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "2fr 1fr",
+            gap: isMobile ? "40px" : "60px",
+        },
+        logoSection: {
+            textAlign: isMobile ? "center" : "left",
+        },
+        footerLogo: {
+            fontSize: isMobile ? "1.6rem" : "2rem",
+            fontWeight: "900",
+            background: "linear-gradient(135deg, #f5f5f5 0%, #9B59B6 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textDecoration: "none",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            marginBottom: "20px",
+            display: "block",
+            textShadow: "0 0 20px rgba(155, 89, 182, 0.3)",
+            filter: "drop-shadow(0 0 8px rgba(155, 89, 182, 0.2))",
+            transition: "all 0.3s ease",
+        },
+        tagline: {
+            fontSize: isMobile ? "1rem" : "1.1rem",
+            color: "#cccccc",
+            lineHeight: "1.6",
+            maxWidth: "400px",
+            margin: isMobile ? "0 auto" : "0",
+        },
+        linksSection: {
+            display: "flex",
+            flexDirection: "column",
+            gap: isMobile ? "30px" : "40px",
+        },
+        footerLinks: {
+            display: "grid",
+            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(3, 1fr)",
+            gap: isMobile ? "12px" : "16px",
+        },
+        footerLink: {
+            color: "#f5f5f5",
+            textDecoration: "none",
+            fontSize: isMobile ? "0.85rem" : "0.95rem",
+            fontWeight: "500",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            padding: isMobile ? "6px 0" : "8px 0",
+            transition: "all 0.3s ease",
+            borderBottom: "1px solid transparent",
+            textAlign: isMobile ? "center" : "left",
+        },
+        socialSection: {
+            textAlign: "center",
+        },
+        socialTitle: {
+            fontSize: isMobile ? "0.9rem" : "1rem",
+            fontWeight: "700",
+            color: "#f5f5f5",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            marginBottom: isMobile ? "16px" : "20px",
+        },
+        socialLinks: {
+            display: "flex",
+            justifyContent: "center",
+            gap: isMobile ? "15px" : "20px",
+            flexWrap: "wrap",
+        },
+        socialLink: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: isMobile ? "44px" : "48px",
+            height: isMobile ? "44px" : "48px",
+            backgroundColor: "rgba(245, 245, 245, 0.05)",
+            border: "1px solid rgba(245, 245, 245, 0.1)",
+            borderRadius: "12px",
+            color: "#f5f5f5",
+            textDecoration: "none",
+            transition: "all 0.3s ease",
+            backdropFilter: "blur(10px)",
+        },
+        divider: {
+            height: "1px",
+            background:
+                "linear-gradient(90deg, transparent 0%, rgba(245, 245, 245, 0.1) 50%, transparent 100%)",
+            margin: isMobile ? "30px 0 20px" : "40px 0 30px",
+        },
+        copyright: {
+            textAlign: "center",
+            color: "#888888",
+            fontSize: isMobile ? "0.8rem" : "0.9rem",
+            fontWeight: "400",
+            letterSpacing: "0.05em",
+            lineHeight: "1.5",
+        },
+        copyrightLink: {
+            color: "#9B59B6",
+            textDecoration: "none",
+            fontWeight: "600",
+            transition: "all 0.3s ease",
+        },
+    }
+
+    const responsiveStyles = `
+        @media (max-width: 850px) {
+            .quick-nav-grid {
+                grid-template-columns: repeat(2, 250px) !important;
+            }
+        }
+        @media (max-width: 580px) {
+            .quick-nav-grid {
+                grid-template-columns: 1fr !important;
+                max-width: 300px;
+            }
+        }
+        @media (max-width: 768px) {
+            .hero {
+                padding: 80px 20px 40px !important;
+            }
+            .hero-title {
+                font-size: 2.5rem !important;
+            }
+            .hero-subtitle {
+                font-size: 1rem !important;
+            }
+            .quick-nav-section {
+                margin: 0 20px 40px !important;
+                padding: 30px 20px !important;
+            }
+            .section {
+                padding: 30px 20px !important;
+            }
+            .section-title {
+                font-size: 2rem !important;
+                margin-bottom: 40px !important;
+            }
+            .expandable-header {
+                padding: 20px !important;
+            }
+            .expandable-content-expanded {
+                padding: 20px !important;
+            }
+            .download-section {
+                padding: 40px 20px !important;
+            }
+            .download-title {
+                font-size: 1.8rem !important;
+            }
+            .download-text {
+                font-size: 1rem !important;
+            }
+            .fonts-section {
+                padding: 40px 20px !important;
+            }
+            .font-sample {
+                font-size: 1.8rem !important;
+            }
+            .color-palette {
+                grid-template-columns: 1fr !important;
+            }
+            .color-technical-info {
+                grid-template-columns: 1fr !important;
+            }
+            .color-spec {
+                padding: 12px !important;
+            }
+            .form-container {
+                height: auto !important;
+                min-height: 500px !important;
+            }
+            .specs-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 20px !important;
+            }
+            .spec-card {
+                padding: 20px !important;
+            }
+            .usage-guidelines-grid, .image-grid {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+            .guideline-card {
+                padding: 20px !important;
+            }
+            .scroll-to-top {
+                bottom: 20px !important;
+                right: 20px !important;
+                width: 45px !important;
+                height: 45px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .specs-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .color-header {
+                flex-direction: column !important;
+                text-align: center !important;
+                gap: 10px !important;
+            }
+            .color-swatch {
+                width: 40px !important;
+                height: 40px !important;
+            }
+        }
+    `
+
+    const navigationItems = [
+        { id: "speaker-bio", label: "Speaker Bio" },
+        { id: "approved-images", label: "Images & Logos" },
+        { id: "colors", label: "Colors" },
+        { id: "typography", label: "Typography" },
+        { id: "usage-guidelines", label: "Usage Guidelines" },
+        { id: "specs", label: "Tech Specs" },
+        { id: "download", label: "Download Kit" },
+    ]
+
+    const brandColors = [
+        {
+            name: "Dark Background",
+            hex: "#1a1a1a",
+            rgb: "26, 26, 26",
+            hsl: "0°, 0%, 10%",
+            cmyk: "C:85 M:85 Y:85 K:85",
+            usage: "Primary backgrounds, dark sections, main container backgrounds",
+        },
+        {
+            name: "Light Text",
+            hex: "#f5f5f5",
+            rgb: "245, 245, 245",
+            hsl: "0°, 0%, 96%",
+            cmyk: "C:0 M:0 Y:0 K:4",
+            usage: "Primary text, headings, button text, main content",
+        },
+        {
+            name: "Purple Accent",
+            hex: "#9b59b6",
+            rgb: "155, 89, 182",
+            hsl: "283°, 39%, 53%",
+            cmyk: "C:58 M:75 Y:0 K:0",
+            usage: "Accent colors, highlights, section titles, special emphasis",
+        },
+        {
+            name: "Purple Primary",
+            hex: "#7b3fbf",
+            rgb: "123, 63, 191",
+            hsl: "268°, 51%, 50%",
+            cmyk: "C:76 M:85 Y:0 K:0",
+            usage: "Call-to-action buttons, interactive elements, primary actions",
+        },
+        {
+            name: "Gray Accent",
+            hex: "#939393",
+            rgb: "147, 147, 147",
+            hsl: "0°, 0%, 58%",
+            cmyk: "C:43 M:35 Y:35 K:9",
+            usage: "Secondary text, subtle elements, descriptive content",
+        },
+    ]
+
+    const speakerBios = [
+        {
+            title: "Short Bio (100 Words)",
+            content:
+                "Glenn Lundy is a renowned leadership coach, keynote speaker, and automotive expert who transformed a small-town dealership into the second-largest used car franchise in America with 800% growth in five years. A two-time Chevy Dealer of the Year, Glenn helps individuals and organizations unlock their potential through his unique blend of mindset, marketing, and management strategies. He's a best-selling author and sought-after speaker who has worked with hundreds of businesses across the U.S., delivering real results and transformation.",
+        },
+        {
+            title: "Medium Bio (200 Words)",
+            content:
+                "Glenn Lundy is a dynamic leadership coach, keynote speaker, and growth strategist who has made national headlines for his extraordinary business achievements. He grew a small-town dealership by 800% in just five years, transforming it into the second-largest used car franchise in the country. This remarkable success earned him recognition as a two-time Chevy Dealer of the Year.\n\nGlenn's expertise extends far beyond the automotive industry. He has worked with hundreds of businesses and leaders across the United States, helping them achieve breakthrough results through his innovative approach that blends mindset transformation, strategic marketing, and effective management practices. His methodologies have been proven to drive real, measurable results for organizations of all sizes.\n\nAs a best-selling author and sought-after speaker, Glenn has been featured in national publications, podcasts, and television programs. His high-energy presentations and workshops are designed to shift mindsets and ignite growth, making him a favorite among conference organizers and corporate leaders.\n\nWhether delivering a keynote address or working one-on-one with executives, Glenn's mission remains constant: to help people unlock what's already inside them so they can lead with purpose, grow with passion, and live to their fullest potential.",
+        },
+        {
+            title: "Long Bio (300+ Words)",
+            content:
+                "Glenn Lundy is a transformational leadership coach, dynamic keynote speaker, and proven growth strategist whose extraordinary journey from struggling dealership to national success story has inspired thousands of business leaders worldwide. His claim to fame comes from achieving the seemingly impossible: growing a small-town automotive dealership by an unprecedented 800% in just five years, ultimately transforming it into the second-largest used car franchise in the entire country.\n\nThis remarkable achievement didn't happen by accident. Glenn's success is rooted in his revolutionary approach that seamlessly blends three critical business elements: mindset transformation, strategic marketing, and effective management practices. His methodologies have been rigorously tested in real-world business environments and have consistently delivered extraordinary results for organizations across multiple industries.\n\nGlenn's expertise has been recognized at the highest levels of the automotive industry, earning him the prestigious honor of being named Chevy Dealer of the Year not once, but twice. However, his impact extends far beyond automotive sales. He has worked with hundreds of businesses and leaders throughout the United States, helping them break through growth barriers and achieve levels of success they never thought possible.\n\nAs a best-selling author, Glenn has captured his proven strategies in written form, making his insights accessible to a broader audience. His expertise has been featured in national publications, podcasts, and television programs, establishing him as a thought leader in business growth and leadership development.\n\nWhat sets Glenn apart as a keynote speaker is his ability to deliver high-energy, content-rich presentations that don't just inspire—they provide actionable strategies that audiences can implement immediately. His workshops and speaking engagements are designed to create lasting mindset shifts that ignite sustainable growth within individuals and organizations.\n\nWhether he's on stage delivering a keynote address to thousands or working intimately with C-suite executives in boardroom consultations, Glenn's mission remains unwavering: to help people unlock the potential that already exists within them so they can lead with authentic purpose, grow with unstoppable passion, and live their lives to the absolute fullest potential.",
+        },
+    ]
+
+    const usageGuidelines = [
+        {
+            title: "Brand Logos",
+            dos: [
+                "Use official logos provided",
+                "Maintain proper clear space (2x logo height)",
+                "Respect minimum size requirements (120px width)",
+                "Use on appropriate background colors",
+                "Maintain aspect ratio when scaling",
+            ],
+            donts: [
+                "Recreate or modify the logo",
+                "Distort or stretch the logo",
+                "Place logo on busy backgrounds",
+                "Use unofficial color variations",
+                "Add effects or shadows to the logo",
+            ],
+        },
+        {
+            title: "Color Guidelines",
+            dos: [
+                "Use approved brand colors only",
+                "Maintain proper contrast ratios",
+                "Test accessibility standards",
+                "Use consistent color application",
+            ],
+            donts: [
+                "Create new color variations",
+                "Use colors outside the brand palette",
+                "Ignore accessibility requirements",
+                "Mix brand colors inappropriately",
+            ],
+        },
+        {
+            title: "Typography Guidelines",
+            dos: [
+                "Use approved system fonts",
+                "Maintain proper hierarchy",
+                "Ensure readability across devices",
+                "Use consistent font weights",
+            ],
+            donts: [
+                "Substitute with other fonts when possible",
+                "Ignore font weight specifications",
+                "Create illegible text combinations",
+                "Use excessive font variations",
+            ],
+        },
+        {
+            title: "Photography Guidelines",
+            dos: [
+                "Use high-quality, professional images",
+                "Maintain brand consistency in style",
+                "Contact for approved headshots",
+                "Ensure proper lighting and composition",
+            ],
+            donts: [
+                "Use low-resolution images",
+                "Apply heavy filters or effects",
+                "Use unofficial or outdated photos",
+                "Crop approved images inappropriately",
+            ],
+        },
+    ]
+
+    const techSpecs = [
+        {
+            title: "Logo Formats",
+            value: "PNG, SVG, JPG",
+            description: "High-resolution formats for all applications",
+        },
+        {
+            title: "Minimum Size",
+            value: "120px",
+            description: "Minimum width for logo legibility",
+        },
+        {
+            title: "Clear Space",
+            value: "2x Height",
+            description: "Minimum clear space around logo",
+        },
+        {
+            title: "Print Resolution",
+            value: "300 DPI",
+            description: "Minimum resolution for print materials",
+        },
+    ]
+
+    const approvedImages = [
+        // Row 1
+        {
+            title: "Glenn Lundy Speaking",
+            description: "Official photo of Glenn Lundy speaking at an event.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1i0qiNPQ_iqZMh-KJxokCPjviZFHN09wh",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1i0qiNPQ_iqZMh-KJxokCPjviZFHN09wh",
+            fileType: "JPG",
+        },
+        {
+            title: "Glenn Lundy Training",
+            description:
+                "Official photo of Glenn Lundy during a training session.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1Olfe-30WaxB0DRhQLDNy74ha6R8R47B-",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1Olfe-30WaxB0DRhQLDNy74ha6R8R47B-",
+            fileType: "JPG",
+        },
+        {
+            title: "Glenn Lundy Training",
+            description:
+                "Official photo of Glenn Lundy during a training session.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=16HI3IVxuZHPD18GAeWGHIibODKCx9JMg",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=16HI3IVxuZHPD18GAeWGHIibODKCx9JMg",
+            fileType: "JPG",
+        },
+        // Row 2 (New Images)
+        {
+            title: "Glenn Lundy Lifestyle Image",
+            description: "A lifestyle photo of Glenn Lundy for general use.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1Hu_K4816HY14y67me9oxKNt50hshPK3e",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1Hu_K4816HY14y67me9oxKNt50hshPK3e",
+            fileType: "JPG",
+        },
+        {
+            title: "Glenn Lundy Headshot",
+            description: "An alternative official headshot of Glenn Lundy.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1I41vJucFsIYVRil9pll8CynDMr2PIIJI",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1I41vJucFsIYVRil9pll8CynDMr2PIIJI",
+            fileType: "JPG",
+        },
+        {
+            title: "Glenn Lundy Podcast Image",
+            description: "Image of Glenn Lundy during a podcast recording.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1RRbYOeds58sva06Avc_ASaC_g7VqRPpC",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1RRbYOeds58sva06Avc_ASaC_g7VqRPpC",
+            fileType: "JPG",
+        },
+        // Row 3 (Remaining Headshots & First Logo)
+        {
+            title: "Glenn Lundy Headshot",
+            description: "Official headshot for speaker profiles and articles.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1HXx0RS2xvPyNW8I3XwTMQCgaTetW4Gob",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1HXx0RS2xvPyNW8I3XwTMQCgaTetW4Gob",
+            fileType: "JPG",
+        },
+        {
+            title: "Glenn Lundy Headshot",
+            description: "Official headshot for speaker profiles and articles.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1SQ_tatKoXnhC8Ew5dcRize-gdjsvn867",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1SQ_tatKoXnhC8Ew5dcRize-gdjsvn867",
+            fileType: "JPG",
+        },
+        {
+            title: "800% Elite Auto Logo (Black)",
+            description: "The primary logo for use on light backgrounds.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1--iZGlHqbREIbm-W_89ltOP9QHpXLbL4",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1--iZGlHqbREIbm-W_89ltOP9QHpXLbL4",
+            fileType: "PNG",
+        },
+        // Row 4 (Remaining Logos)
+        {
+            title: "800% Logo (Black)",
+            description: "The secondary logo for use on light backgrounds.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1enT1GEH1wsloyTO69Q35kiqUgTaIAoM5",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1enT1GEH1wsloyTO69Q35kiqUgTaIAoM5",
+            fileType: "PNG",
+        },
+        {
+            title: "800% Elite Auto Logo (White)",
+            description: "For use on dark or colored backgrounds.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1mIgOJ_c2L3PpF6sU1Q09Kt2yc4QMd-2f",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1mIgOJ_c2L3PpF6sU1Q09Kt2yc4QMd-2f",
+            fileType: "PNG",
+            isWhite: true,
+        },
+        {
+            title: "800% Logo (White)",
+            description: "For use on dark or colored backgrounds.",
+            previewUrl:
+                "https://drive.google.com/thumbnail?id=1dWbEFbBVY51ie_wiCsprMQDGWEiUXVvM",
+            downloadUrl:
+                "https://drive.google.com/uc?export=download&id=1dWbEFbBVY51ie_wiCsprMQDGWEiUXVvM",
+            fileType: "PNG",
+            isWhite: true,
+        },
+    ]
+
+    const ExpandableSection = ({ title, children, sectionId }) => {
+        const isExpanded = expandedSections[sectionId]
+
+        return (
+            <div style={styles.expandableSection}>
+                <div
+                    style={{
+                        ...styles.expandableHeader,
+                        ...(hoveredNavButton === sectionId
+                            ? styles.expandableHeaderHover
+                            : {}),
+                    }}
+                    onClick={() => toggleSection(sectionId)}
+                    onMouseEnter={() => setHoveredNavButton(sectionId)}
+                    onMouseLeave={() => setHoveredNavButton(null)}
+                    className="expandable-header"
+                >
+                    <h3 style={styles.expandableTitle}>{title}</h3>
+                    <div
+                        style={{
+                            ...styles.expandIcon,
+                            ...(isExpanded ? styles.expandIconRotated : {}),
+                        }}
+                    >
+                        ▼
+                    </div>
+                </div>
+                <div
+                    style={{
+                        ...styles.expandableContent,
+                        ...(isExpanded ? styles.expandableContentExpanded : {}),
+                    }}
+                    className={isExpanded ? "expandable-content-expanded" : ""}
+                >
+                    {children}
+                </div>
+            </div>
+        )
+    }
+
+    return (
+        <>
+            <style>{responsiveStyles}</style>
+            <div style={styles.container}>
+                {/* Hero Section */}
+                <section style={styles.hero} className="hero">
+                    <h1 style={styles.heroTitle} className="hero-title">
+                        Media <span style={styles.purpleAccent}>Kit</span>
+                    </h1>
+                    <p style={styles.heroSubtitle} className="hero-subtitle">
+                        Official brand guidelines, logos, and assets for Glenn
+                        Lundy. Everything you need to represent our brand
+                        consistently and professionally.
+                    </p>
+                </section>
+
+                {/* Quick Navigation */}
+                <section
+                    style={styles.quickNavSection}
+                    className="quick-nav-section"
+                >
+                    <div style={styles.quickNavGrid} className="quick-nav-grid">
+                        {navigationItems.map((item) => (
+                            <button
+                                key={item.id}
+                                style={{
+                                    ...styles.quickNavButton,
+                                    ...(hoveredButton === item.id
+                                        ? styles.quickNavButtonHover
+                                        : {}),
+                                    ...(item.id === "download"
+                                        ? { gridColumn: "2 / 3" }
+                                        : {}),
+                                }}
+                                onClick={() => scrollToSection(item.id)}
+                                onMouseEnter={() => setHoveredButton(item.id)}
+                                onMouseLeave={() => setHoveredButton(null)}
+                                className="quick-nav-button"
+                            >
+                                {item.label}
+                            </button>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Speaker Bio Section */}
+                <section
+                    id="speaker-bio"
+                    style={styles.section}
+                    className="section"
+                >
+                    <h2 style={styles.sectionTitle} className="section-title">
+                        Speaker <span style={styles.purpleAccent}>Bio</span>
+                    </h2>
+
+                    <ExpandableSection
+                        title="Short Bio (100 Words)"
+                        sectionId="short-bio"
+                    >
+                        <div style={styles.bioCard}>
+                            <p style={styles.bioText}>
+                                {speakerBios[0].content}
+                            </p>
+                        </div>
+                    </ExpandableSection>
+
+                    <ExpandableSection
+                        title="Medium Bio (200 Words)"
+                        sectionId="medium-bio"
+                    >
+                        <div style={styles.bioCard}>
+                            <div style={styles.bioText}>
+                                {speakerBios[1].content
+                                    .split("\n\n")
+                                    .map((paragraph, index) => (
+                                        <p
+                                            key={index}
+                                            style={{
+                                                marginBottom:
+                                                    index ===
+                                                    speakerBios[1].content.split(
+                                                        "\n\n"
+                                                    ).length -
+                                                        1
+                                                        ? 0
+                                                        : "1rem",
+                                            }}
+                                        >
+                                            {paragraph}
+                                        </p>
+                                    ))}
+                            </div>
+                        </div>
+                    </ExpandableSection>
+
+                    <ExpandableSection
+                        title="Long Bio (300+ Words)"
+                        sectionId="long-bio"
+                    >
+                        <div style={styles.bioCard}>
+                            <div style={styles.bioText}>
+                                {speakerBios[2].content
+                                    .split("\n\n")
+                                    .map((paragraph, index) => (
+                                        <p
+                                            key={index}
+                                            style={{
+                                                marginBottom:
+                                                    index ===
+                                                    speakerBios[2].content.split(
+                                                        "\n\n"
+                                                    ).length -
+                                                        1
+                                                        ? 0
+                                                        : "1rem",
+                                            }}
+                                        >
+                                            {paragraph}
+                                        </p>
+                                    ))}
+                            </div>
+                        </div>
+                    </ExpandableSection>
+                </section>
+
+                {/* Approved Images & Logos Section */}
+                <section
+                    id="approved-images"
+                    style={styles.section}
+                    className="section"
+                >
+                    <h2 style={styles.sectionTitle}>
+                        Approved{" "}
+                        <span style={styles.purpleAccent}>Images & Logos</span>
+                    </h2>
+                    <div style={styles.imageGrid} className="image-grid">
+                        {approvedImages.map((image, index) => (
+                            <div
+                                key={index}
+                                style={{
+                                    ...styles.imageCard,
+                                    ...(hoveredNavButton === `image-${index}`
+                                        ? styles.imageCardHover
+                                        : {}),
+                                }}
+                                onMouseEnter={() =>
+                                    setHoveredNavButton(`image-${index}`)
+                                }
+                                onMouseLeave={() => setHoveredNavButton(null)}
+                            >
+                                <div
+                                    style={{
+                                        ...styles.imagePreview,
+                                        backgroundImage: `url(${image.previewUrl})`,
+                                        ...(image.isWhite && {
+                                            backgroundColor: "#2a2a2a",
+                                        }),
+                                    }}
+                                ></div>
+                                <div style={styles.imageInfo}>
+                                    <h3 style={styles.imageTitle}>
+                                        {image.title}
+                                    </h3>
+                                    <p style={styles.imageDescription}>
+                                        {image.description}
+                                    </p>
+                                    <a
+                                        href={image.downloadUrl}
+                                        style={styles.downloadButton}
+                                        download
+                                    >
+                                        Download {image.fileType}
+                                    </a>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Brand Colors */}
+                <section id="colors" style={styles.section} className="section">
+                    <h2 style={styles.sectionTitle} className="section-title">
+                        Brand <span style={styles.purpleAccent}>Colors</span>
+                    </h2>
+
+                    <ExpandableSection
+                        title="Color Palette & Specifications"
+                        sectionId="color-palette"
+                    >
+                        <div style={styles.colorsSection}>
+                            <div
+                                style={styles.colorPalette}
+                                className="color-palette"
+                            >
+                                {brandColors.map((color, index) => (
+                                    <div
+                                        key={index}
+                                        style={{
+                                            ...styles.colorCard,
+                                            ...(copiedColor === color.name ||
+                                            hoveredNavButton ===
+                                                `color-${index}`
+                                                ? styles.colorCardHover
+                                                : {}),
+                                        }}
+                                        onClick={() =>
+                                            copyToClipboard(
+                                                color.hex,
+                                                color.name
+                                            )
+                                        }
+                                        onMouseEnter={() =>
+                                            setHoveredNavButton(
+                                                `color-${index}`
+                                            )
+                                        }
+                                        onMouseLeave={() =>
+                                            setHoveredNavButton(null)
+                                        }
+                                        title="Click to copy hex code"
+                                    >
+                                        <div
+                                            style={{
+                                                ...styles.copyIndicator,
+                                                ...(copiedColor === color.name
+                                                    ? styles.copyIndicatorVisible
+                                                    : {}),
+                                            }}
+                                        >
+                                            Copied!
+                                        </div>
+                                        <div
+                                            style={styles.colorHeader}
+                                            className="color-header"
+                                        >
+                                            <div
+                                                style={{
+                                                    ...styles.colorSwatch,
+                                                    backgroundColor: color.hex,
+                                                }}
+                                                className="color-swatch"
+                                            />
+                                            <div style={styles.colorMainInfo}>
+                                                <h3 style={styles.colorName}>
+                                                    {color.name}
+                                                </h3>
+                                                <p style={styles.colorHex}>
+                                                    {color.hex}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div
+                                            style={styles.colorTechnicalInfo}
+                                            className="color-technical-info"
+                                        >
+                                            <div
+                                                style={styles.colorSpec}
+                                                className="color-spec"
+                                            >
+                                                <div style={styles.specLabel}>
+                                                    RGB
+                                                </div>
+                                                <div style={styles.specValue}>
+                                                    rgb({color.rgb})
+                                                </div>
+                                            </div>
+                                            <div
+                                                style={styles.colorSpec}
+                                                className="color-spec"
+                                            >
+                                                <div style={styles.specLabel}>
+                                                    HSL
+                                                </div>
+                                                <div style={styles.specValue}>
+                                                    hsl({color.hsl})
+                                                </div>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    ...styles.colorSpec,
+                                                    gridColumn: "1 / -1",
+                                                }}
+                                                className="color-spec"
+                                            >
+                                                <div style={styles.specLabel}>
+                                                    CMYK (Print)
+                                                </div>
+                                                <div style={styles.specValue}>
+                                                    {color.cmyk}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={styles.colorUsage}>
+                                            <strong>Usage:</strong>{" "}
+                                            {color.usage}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div
+                                style={{
+                                    backgroundColor: "rgba(155, 89, 182, 0.05)",
+                                    border: "1px solid rgba(155, 89, 182, 0.2)",
+                                    borderRadius: "16px",
+                                    padding: "20px",
+                                    marginTop: "20px",
+                                }}
+                            >
+                                <h4
+                                    style={{
+                                        color: "#9b59b6",
+                                        marginBottom: "10px",
+                                        fontSize: "1.1rem",
+                                        fontWeight: "700",
+                                    }}
+                                >
+                                    Accessibility Notes
+                                </h4>
+                                <p
+                                    style={{
+                                        color: "#939393",
+                                        fontSize: "0.9rem",
+                                        lineHeight: "1.4",
+                                        margin: 0,
+                                    }}
+                                >
+                                    • Dark background (#1a1a1a) with light text
+                                    (#f5f5f5) provides 14.6:1 contrast ratio
+                                    <br />
+                                    • Purple accent (#9b59b6) on dark background
+                                    provides 4.8:1 contrast ratio
+                                    <br />• All color combinations meet WCAG AA
+                                    accessibility standards
+                                </p>
+                            </div>
+                        </div>
+                    </ExpandableSection>
+                </section>
+
+                {/* Typography */}
+                <section
+                    id="typography"
+                    style={styles.section}
+                    className="section"
+                >
+                    <h2 style={styles.sectionTitle} className="section-title">
+                        <span style={styles.purpleAccent}>Typography</span>
+                    </h2>
+
+                    <ExpandableSection
+                        title="Font Specifications & Examples"
+                        sectionId="typography-specs"
+                    >
+                        <div
+                            style={styles.fontsSection}
+                            className="fonts-section"
+                        >
+                            <div style={styles.fontExample}>
+                                <h3 style={styles.fontName}>Segoe UI</h3>
+                                <div
+                                    style={{
+                                        ...styles.fontSample,
+                                        fontFamily: "'Segoe UI', sans-serif",
+                                    }}
+                                    className="font-sample"
+                                >
+                                    Leadership Excellence
+                                </div>
+                                <p style={styles.fontDescription}>
+                                    Primary font for Windows users. Clean,
+                                    modern, and highly readable.
+                                </p>
+                            </div>
+                            <div style={styles.fontExample}>
+                                <h3 style={styles.fontName}>San Francisco</h3>
+                                <div
+                                    style={{
+                                        ...styles.fontSample,
+                                        fontFamily: "-apple-system, san-serif",
+                                    }}
+                                    className="font-sample"
+                                >
+                                    Transform Your Business
+                                </div>
+                                <p style={styles.fontDescription}>
+                                    Apple's system font for macOS and iOS users.
+                                    Optimized for readability.
+                                </p>
+                            </div>
+                            <div style={styles.fontExample}>
+                                <h3 style={styles.fontName}>Roboto</h3>
+                                <div
+                                    style={{
+                                        ...styles.fontSample,
+                                        fontFamily: "'Roboto', sans-serif",
+                                    }}
+                                    className="font-sample"
+                                >
+                                    Growth & Mindset
+                                </div>
+                                <p style={styles.fontDescription}>
+                                    Default font for Android and other systems.
+                                    Versatile and well-rounded.
+                                </p>
+                            </div>
+                        </div>
+                    </ExpandableSection>
+                </section>
+
+                {/* Usage Guidelines Section */}
+                <section
+                    id="usage-guidelines"
+                    style={styles.section}
+                    className="section"
+                >
+                    <h2 style={styles.sectionTitle}>
+                        Usage{" "}
+                        <span style={styles.purpleAccent}>Guidelines</span>
+                    </h2>
+                    <div
+                        style={styles.usageGuidelinesGrid}
+                        className="usage-guidelines-grid"
+                    >
+                        {usageGuidelines.map((category, index) => (
+                            <div key={index} style={styles.guidelineCard}>
+                                <h3 style={styles.guidelineTitle}>
+                                    {category.title}
+                                </h3>
+                                <h4 style={styles.guidelineListTitle}>
+                                    **DO:**
+                                </h4>
+                                <ul style={styles.guidelineList}>
+                                    {category.dos.map((item, i) => (
+                                        <li
+                                            key={i}
+                                            style={styles.guidelineItem}
+                                        >
+                                            <span
+                                                style={styles.guidelineItemBefore(
+                                                    false
+                                                )}
+                                            ></span>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <h4
+                                    style={{
+                                        ...styles.guidelineListTitle,
+                                        marginTop: "20px",
+                                    }}
+                                >
+                                    **DON'T:**
+                                </h4>
+                                <ul style={styles.guidelineList}>
+                                    {category.donts.map((item, i) => (
+                                        <li
+                                            key={i}
+                                            style={styles.guidelineItem}
+                                        >
+                                            <span
+                                                style={styles.guidelineItemBefore(
+                                                    true
+                                                )}
+                                            ></span>
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Tech Specs Section */}
+                <section id="specs" style={styles.section} className="section">
+                    <h2 style={styles.sectionTitle}>
+                        Tech <span style={styles.purpleAccent}>Specs</span>
+                    </h2>
+                    <div style={styles.specsGrid} className="specs-grid">
+                        {techSpecs.map((spec, index) => (
+                            <div key={index} style={styles.specCard}>
+                                <h3 style={styles.specTitle}>{spec.title}</h3>
+                                <p style={styles.specValueLarge}>
+                                    {spec.value}
+                                </p>
+                                <p style={styles.specDescription}>
+                                    {spec.description}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Download Complete Media Kit Section */}
+                <section
+                    id="download"
+                    style={styles.section}
+                    className="section"
+                >
+                    <div
+                        style={styles.downloadSection}
+                        className="download-section"
+                    >
+                        <div style={styles.downloadContent}>
+                            <div style={styles.downloadTextColumn}>
+                                <h2 style={styles.downloadTitle}>
+                                    Download The Complete{" "}
+                                    <span style={styles.purpleAccent}>
+                                        Media Kit
+                                    </span>
+                                </h2>
+                                <p style={styles.downloadText}>
+                                    Get instant access to our comprehensive
+                                    media kit. Enter your details to receive
+                                    high-resolution logos, brand guidelines, and
+                                    more.
+                                </p>
+                            </div>
+                            <div
+                                style={styles.formContainer}
+                                className="form-container"
+                            >
+                                <iframe
+                                    src="https://api.leadconnectorhq.com/widget/form/4D7BSp1VzktEeRAPyzhK"
+                                    style={styles.formIframe}
+                                    className="form-iframe"
+                                    id="inline-4D7BSp1VzktEeRAPyzhK"
+                                    data-layout-iframe-id="inline-4D7BSp1VzktEeRAPyzhK"
+                                    data-form-id="4D7BSp1VzktEeRAPyzhK"
+                                    title="Download Media Kit"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Scroll to Top Button */}
+                <button
+                    style={{
+                        ...styles.scrollToTop,
+                        ...(hoveredButton === "scroll"
+                            ? styles.scrollToTopHover
+                            : {}),
+                    }}
+                    onClick={scrollToTop}
+                    onMouseEnter={() => setHoveredButton("scroll")}
+                    onMouseLeave={() => setHoveredButton(null)}
+                    className="scroll-to-top"
+                >
+                    ▲
+                </button>
+
+                {/* Footer */}
+                <footer style={styles.footer}>
+                    <div style={styles.footerGlowEffect}></div>
+                    <div style={styles.footerContainer}>
+                        <div style={styles.footerContent}>
+                            <div style={styles.logoSection}>
+                                <a
+                                    href="/"
+                                    style={styles.footerLogo}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform =
+                                            "translateY(-2px)"
+                                        e.target.style.textShadow =
+                                            "0 0 25px rgba(155, 89, 182, 0.5)"
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform =
+                                            "translateY(0)"
+                                        e.target.style.textShadow =
+                                            "0 0 20px rgba(155, 89, 182, 0.3)"
+                                    }}
+                                >
+                                    Glenn Lundy
+                                </a>
+                                <p style={styles.tagline}>
+                                    Transformational leadership experiences that
+                                    create lasting change from the inside out.
+                                </p>
+                            </div>
+
+                            <div style={styles.linksSection}>
+                                <div style={styles.footerLinks}>
+                                    {footerLinks.map((link, index) => (
+                                        <a
+                                            key={index}
+                                            href={link.href}
+                                            style={styles.footerLink}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.color = "#9B59B6"
+                                                e.target.style.borderBottomColor =
+                                                    "rgba(155, 89, 182, 0.3)"
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.color = "#f5f5f5"
+                                                e.target.style.borderBottomColor =
+                                                    "transparent"
+                                            }}
+                                        >
+                                            {link.label}
+                                        </a>
+                                    ))}
+                                </div>
+
+                                <div style={styles.socialSection}>
+                                    <h3 style={styles.socialTitle}>Follow</h3>
+                                    <div style={styles.socialLinks}>
+                                        {socialLinks.map((social, index) => (
+                                            <a
+                                                key={index}
+                                                href={social.href}
+                                                title={social.name}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={styles.socialLink}
+                                                onMouseEnter={(e) => {
+                                                    const target =
+                                                        e.currentTarget
+                                                    target.style.backgroundColor =
+                                                        "rgba(155, 89, 182, 0.2)"
+                                                    target.style.borderColor =
+                                                        "#9B59B6"
+                                                    target.style.color =
+                                                        "#9B59B6"
+                                                    target.style.transform =
+                                                        "translateY(-2px)"
+                                                    target.style.boxShadow =
+                                                        "0 8px 25px rgba(155, 89, 182, 0.3)"
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    const target =
+                                                        e.currentTarget
+                                                    target.style.backgroundColor =
+                                                        "rgba(245, 245, 245, 0.05)"
+                                                    target.style.borderColor =
+                                                        "rgba(245, 245, 245, 0.1)"
+                                                    target.style.color =
+                                                        "#f5f5f5"
+                                                    target.style.transform =
+                                                        "translateY(0)"
+                                                    target.style.boxShadow =
+                                                        "none"
+                                                }}
+                                            >
+                                                {social.icon}
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={styles.divider}></div>
+
+                        <div style={styles.copyright}>
+                            © {new Date().getFullYear()}{" "}
+                            <a
+                                href="/"
+                                style={styles.copyrightLink}
+                                onMouseEnter={(e) => {
+                                    e.target.style.color = "#7B3FBF"
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.target.style.color = "#9B59B6"
+                                }}
+                            >
+                                Glenn Lundy
+                            </a>
+                            . All rights reserved.
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </>
+    )
+}
